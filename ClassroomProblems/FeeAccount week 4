@@ -1,0 +1,82 @@
+class FeeAccount {
+
+    String accountType;
+
+    FeeAccount(String accountType) {
+        this.accountType = accountType;
+    }
+}
+
+class HostelFeeAccount extends FeeAccount {
+
+    HostelFeeAccount() {
+        super("Hostel");
+    }
+}
+
+class DayScholarFeeAccount extends FeeAccount {
+
+    DayScholarFeeAccount() {
+        super("Day Scholar");
+    }
+}
+
+class PaymentProcessor {
+
+    int hostelCount = 0;
+    int dayScholarCount = 0;
+
+    void processPayment(FeeAccount account, double amount) {
+
+        if (account instanceof HostelFeeAccount) {
+
+            System.out.println(
+                "Paid in two installments (hostel account)"
+            );
+
+            hostelCount++;
+
+        } else if (account instanceof FeeAccount) {
+
+            System.out.println(
+                "Paid in one go (day-scholar account)"
+            );
+
+            dayScholarCount++;
+        }
+    }
+
+    void printCounts() {
+
+        System.out.println(
+            "Hostel accounts processed: " + hostelCount +
+            " | Day-scholar accounts processed: " +
+            dayScholarCount
+        );
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        FeeAccount[] accounts = {
+            new HostelFeeAccount(),
+            new HostelFeeAccount(),
+            new DayScholarFeeAccount(),
+            new DayScholarFeeAccount()
+        };
+
+        double amount = 60000;
+
+        PaymentProcessor processor =
+            new PaymentProcessor();
+
+        // Process complete batch in one pass
+        for (FeeAccount account : accounts) {
+            processor.processPayment(account, amount);
+        }
+
+        // Print counters once after processing
+        processor.printCounts();
+    }
+}
