@@ -2,7 +2,7 @@
 
 ## Week 5
 
-## Date: DD-MM-YYYY
+## Date: 05-09-2026
 
 **Today's Work:**
 - Completed the Week 5 classwork problems.
@@ -23,7 +23,7 @@
 
 ## Week 4
 
-## Date: DD-MM-YYYY
+## Date: 29-08-2026
 
 **Today's Work:**
 - Completed the Week 4 classwork problems.
@@ -46,7 +46,7 @@
 
 ## Week 3
 
-## Date: DD-MM-YYYY
+## Date: 22-08-2026
 
 **Today's Work:**
 - Completed the Week 3 classwork problems.
@@ -69,7 +69,7 @@
 
 ## Week 2
 
-## Date: DD-MM-YYYY
+## Date: 08-08-2026
 
 **Today's Work:**
 - Completed the Week 2 classwork problems.
@@ -92,7 +92,7 @@
 
 ## Week 1
 
-## Date: DD-MM-YYYY
+## Date: 01-08-2026
 
 **Today's Work:**
 - Completed the Week 1 classwork problems.
