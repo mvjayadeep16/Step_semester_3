@@ -1,0 +1,119 @@
+import java.util.*;
+
+abstract class Vehicle {
+    protected String id;
+    protected double dailyRate;
+    protected boolean available = true;
+
+    Vehicle(String id, double dailyRate) {
+        this.id = id;
+        this.dailyRate = dailyRate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    public abstract double calculateCharge(int days);
+}
+
+class Sedan extends Vehicle {
+    Sedan(String id, double rate) {
+        super(id, rate);
+    }
+
+    public double calculateCharge(int days) {
+        return dailyRate * days;
+    }
+}
+
+class SUV extends Vehicle {
+    SUV(String id, double rate) {
+        super(id, rate);
+    }
+
+    public double calculateCharge(int days) {
+        return dailyRate * days * 1.2;
+    }
+}
+
+class Customer {
+    String name;
+
+    Customer(String name) {
+        this.name = name;
+    }
+}
+
+class Rental {
+    Vehicle vehicle;
+    Customer customer;
+    int days;
+
+    Rental(Vehicle vehicle, Customer customer, int days) {
+        this.vehicle = vehicle;
+        this.customer = customer;
+        this.days = days;
+    }
+
+    void returnVehicle() {
+        vehicle.setAvailable(true);
+        System.out.println(vehicle.getId() +
+            " returned by " + customer.name);
+    }
+}
+
+class VehicleRentalSystem {
+    public Rental rent(Vehicle vehicle, Customer customer, int days) {
+        if (!vehicle.isAvailable()) {
+            System.out.println(vehicle.getId() +
+                " is currently unavailable.");
+            return null;
+        }
+
+        if (days <= 0) {
+            System.out.println("Invalid rental duration.");
+            return null;
+        }
+
+        vehicle.setAvailable(false);
+        Rental rental = new Rental(vehicle, customer, days);
+
+        System.out.println(vehicle.getId() +
+            " rented successfully by " + customer.name);
+        System.out.println("Rental charge: $" +
+            vehicle.calculateCharge(days));
+
+        return rental;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        VehicleRentalSystem system = new VehicleRentalSystem();
+
+        Vehicle sedan = new Sedan("Sedan A", 50);
+        Vehicle suv = new SUV("SUV B", 80);
+
+        Customer c1 = new Customer("Customer 1");
+        Customer c2 = new Customer("Customer 2");
+        Customer c3 = new Customer("Customer 3");
+
+        Rental rental = system.rent(sedan, c1, 3);
+        system.rent(sedan, c2, 2);
+
+        if (rental != null) {
+            rental.returnVehicle();
+        }
+
+        system.rent(suv, c3, 5);
+    }
+}
