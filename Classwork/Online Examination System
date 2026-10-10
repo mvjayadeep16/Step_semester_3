@@ -1,0 +1,136 @@
+import java.util.*;
+
+class Student {
+    String name;
+
+    Student(String name) {
+        this.name = name;
+    }
+}
+
+abstract class Question {
+    String text;
+    int marks;
+
+    Question(String text, int marks) {
+        this.text = text;
+        this.marks = marks;
+    }
+
+    abstract boolean evaluate(String answer);
+}
+
+class MCQ extends Question {
+    String correctOption;
+
+    MCQ(String text, int marks, String correctOption) {
+        super(text, marks);
+        this.correctOption = correctOption;
+    }
+
+    boolean evaluate(String answer) {
+        return correctOption.equalsIgnoreCase(answer);
+    }
+}
+
+class TrueFalseQuestion extends Question {
+    boolean correctAnswer;
+
+    TrueFalseQuestion(String text, int marks, boolean correctAnswer) {
+        super(text, marks);
+        this.correctAnswer = correctAnswer;
+    }
+
+    boolean evaluate(String answer) {
+        return Boolean.toString(correctAnswer).equalsIgnoreCase(answer);
+    }
+}
+
+class Examination {
+    String title;
+    List<Question> questions = new ArrayList<>();
+
+    Examination(String title) {
+        this.title = title;
+    }
+
+    void addQuestion(Question question) {
+        questions.add(question);
+    }
+}
+
+class Attempt {
+    Student student;
+    Examination exam;
+    Map<Question, String> answers = new LinkedHashMap<>();
+    boolean submitted = false;
+
+    Attempt(Student student, Examination exam) {
+        this.student = student;
+        this.exam = exam;
+        System.out.println(exam.title + " started by " + student.name);
+    }
+
+    void answer(Question question, String answer) {
+        if (submitted) {
+            System.out.println(
+                "Cannot change answers for a submitted examination.");
+            return;
+        }
+
+        if (!exam.questions.contains(question)) {
+            System.out.println("Question does not belong to this exam.");
+            return;
+        }
+
+        answers.put(question, answer);
+        System.out.println("Answer recorded for " + question.text);
+    }
+
+    void submit() {
+        if (submitted) {
+            System.out.println("Examination already submitted.");
+            return;
+        }
+
+        submitted = true;
+        int total = 0;
+        int maximum = 0;
+
+        System.out.println(exam.title + " submitted by " + student.name);
+
+        for (Question q : exam.questions) {
+            maximum += q.marks;
+            boolean correct = answers.containsKey(q) &&
+                q.evaluate(answers.get(q));
+
+            int score = correct ? q.marks : 0;
+            total += score;
+
+            System.out.println(q.text + ": " +
+                (correct ? "Correct" : "Incorrect") +
+                " (" + score + " points)");
+        }
+
+        System.out.println("Total score: " + total + "/" + maximum);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student student = new Student("Student 1");
+        Examination exam = new Examination("Exam A");
+
+        Question q1 = new MCQ("Question 1", 5, "C");
+        Question q2 = new TrueFalseQuestion("Question 2", 5, false);
+
+        exam.addQuestion(q1);
+        exam.addQuestion(q2);
+
+        Attempt attempt = new Attempt(student, exam);
+        attempt.answer(q1, "C");
+        attempt.answer(q2, "True");
+        attempt.submit();
+        attempt.answer(q1, "A");
+    }
+}
