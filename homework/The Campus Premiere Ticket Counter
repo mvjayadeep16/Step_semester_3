@@ -1,0 +1,194 @@
+import java.time.LocalDateTime;
+import java.util.*;
+
+abstract class Seat {
+    String number;
+
+    Seat(String number) {
+        this.number = number;
+    }
+
+    abstract double getPrice();
+}
+
+class RegularSeat extends Seat {
+    RegularSeat(String number) {
+        super(number);
+    }
+
+    double getPrice() {
+        return 150;
+    }
+}
+
+class PremiumSeat extends Seat {
+    PremiumSeat(String number) {
+        super(number);
+    }
+
+    double getPrice() {
+        return 250;
+    }
+}
+
+class ReclinerSeat extends Seat {
+    ReclinerSeat(String number) {
+        super(number);
+    }
+
+    double getPrice() {
+        return 400;
+    }
+}
+
+class Customer {
+    String name;
+
+    Customer(String name) {
+        this.name = name;
+    }
+}
+
+class Show {
+    String name;
+    LocalDateTime startTime;
+    Map<String, Seat> seats = new LinkedHashMap<>();
+    Set<String> bookedSeats = new HashSet<>();
+
+    Show(String name, LocalDateTime startTime) {
+        this.name = name;
+        this.startTime = startTime;
+    }
+
+    void addSeat(Seat seat) {
+        seats.put(seat.number, seat);
+    }
+}
+
+class Booking {
+    Customer customer;
+    Show show;
+    List<Seat> selectedSeats;
+    boolean active = true;
+
+    Booking(Customer customer, Show show, List<Seat> seats) {
+        this.customer = customer;
+        this.show = show;
+        this.selectedSeats = seats;
+    }
+
+    double getTotal() {
+        double total = 0;
+
+        for (Seat seat : selectedSeats) {
+            total += seat.getPrice();
+        }
+
+        return total;
+    }
+
+    void cancel(LocalDateTime now) {
+        if (!active) {
+            System.out.println("Booking already cancelled.");
+            return;
+        }
+
+        if (!now.isBefore(show.startTime)) {
+            System.out.println("Cannot cancel after the show starts.");
+            return;
+        }
+
+        for (Seat seat : selectedSeats) {
+            show.bookedSeats.remove(seat.number);
+        }
+
+        active = false;
+
+        System.out.println(customer.name + "'s booking cancelled.");
+        System.out.println("Seats released: "
+                + getSeatNumbers());
+    }
+
+    String getSeatNumbers() {
+        List<String> names = new ArrayList<>();
+
+        for (Seat seat : selectedSeats) {
+            names.add(seat.number);
+        }
+
+        return String.join(", ", names);
+    }
+}
+
+public class CampusPremiereTicketCounter {
+    static Booking book(Customer customer, Show show,
+                        String... seatNumbers) {
+        if (seatNumbers.length == 0 || seatNumbers.length > 6) {
+            System.out.println("Select between 1 and 6 seats.");
+            return null;
+        }
+
+        Set<String> requested = new HashSet<>(
+                Arrays.asList(seatNumbers));
+
+        if (requested.size() != seatNumbers.length) {
+            System.out.println("Duplicate seats selected.");
+            return null;
+        }
+
+        for (String number : seatNumbers) {
+            if (!show.seats.containsKey(number)) {
+                System.out.println("Invalid seat: " + number);
+                return null;
+            }
+
+            if (show.bookedSeats.contains(number)) {
+                System.out.println("Seat " + number
+                        + " is already booked for this show.");
+                return null;
+            }
+        }
+
+        List<Seat> selected = new ArrayList<>();
+
+        for (String number : seatNumbers) {
+            selected.add(show.seats.get(number));
+        }
+
+        show.bookedSeats.addAll(requested);
+        Booking booking = new Booking(customer, show, selected);
+
+        System.out.println("Booking confirmed for "
+                + customer.name + ": "
+                + booking.getSeatNumbers());
+
+        System.out.printf("Total: ₹%.2f%n", booking.getTotal());
+
+        return booking;
+    }
+
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Show show = new Show("7 PM Show", now.plusHours(2));
+
+        show.addSeat(new RegularSeat("A1"));
+        show.addSeat(new RegularSeat("A2"));
+        show.addSeat(new PremiumSeat("F5"));
+        show.addSeat(new ReclinerSeat("R1"));
+
+        Customer asha = new Customer("Asha");
+        Customer ravi = new Customer("Ravi");
+        Customer neha = new Customer("Neha");
+
+        Booking b1 = book(asha, show, "A1", "A2", "F5");
+        book(ravi, show, "A2");
+        book(ravi, show, "R1");
+
+        if (b1 != null) {
+            b1.cancel(now);
+        }
+
+        book(neha, show, "A2");
+    }
+}
